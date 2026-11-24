@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de História</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #7f1d1d, #d97706);
+            color: #222;
+        }
+
+        header {
+            background: #fff;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 3px 10px #0004;
+        }
+
+        header h1 {
+            color: #991b1b;
+            margin-bottom: 8px;
+        }
+
+        main {
+            width: 90%;
+            max-width: 850px;
+            margin: 30px auto;
+        }
+
+        .tela {
+            background: white;
+            padding: 30px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px #0004;
+        }
+
+        .oculto {
+            display: none;
+        }
+
+        h2 {
+            color: #991b1b;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #aaa;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 13px 20px;
+            margin-top: 20px;
+            background: #991b1b;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #7f1d1d;
+        }
+
+        .dados-jogador {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: #fef3c7;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        #numero-pergunta {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        #pergunta {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .alternativas {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .alternativa {
+            width: 100%;
+            margin: 0;
+            text-align: left;
+            background: #f3f4f6;
+            color: #222;
+        }
+
+        .alternativa:hover {
+            background: #e5e7eb;
+        }
+
+        .alternativa.correta {
+            background: #bbf7d0;
+            color: #166534;
+            border: 2px solid #16a34a;
+        }
+
+        .alternativa.errada {
+            background: #fecaca;
+            color: #991b1b;
+            border: 2px solid #dc2626;
+        }
+
+        .alternativa:disabled {
+            cursor: not-allowed;
+        }
+
+        #explicacao {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fef3c7;
+            border-left: 5px solid #d97706;
+            line-height: 1.6;
+        }
+
+        #pontuacao {
+            margin: 20px 0;
+            color: #15803d;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .ranking ol {
+            padding-left: 25px;
+        }
+
+        .ranking li {
+            padding: 10px;
+            margin-bottom: 6px;
+            background: #f3f4f6;
+            border-radius: 6px;
+        }
+
+        .ranking li:first-child {
+            background: #fef3c7;
+            font-weight: bold;
+        }
+
+        .erro {
+            color: #dc2626;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .tela {
+                padding: 20px;
+            }
+
+            .dados-jogador {
+                flex-direction: column;
+            }
+
+            #pergunta {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Quiz de História</h1>
+        <p>Teste seus conhecimentos sobre acontecimentos históricos</p>
+    </header>
+
+    <main>
+
+        <!-- Tela de cadastro -->
+        <section id="tela-cadastro" class="tela">
+            <h2>Cadastro do jogador</h2>
+
+            <form id="formulario-cadastro">
+                <label for="nome">Nome:</label>
+                <input
+                    type="text"
+                    id="nome"
+                    placeholder="Digite seu nome"
+                    required
+                >
+
+                <label for="email">E-mail:</label>
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Digite seu e-mail"
+                    required
+                >
+
+                <p id="mensagem-erro" class="erro"></p>
+
+                <button type="submit">
+                    Começar quiz
+                </button>
+            </form>
+        </section>
+
+        <!-- Tela do quiz -->
+        <section id="tela-quiz" class="tela oculto">
+
+            <div class="dados-jogador">
+                <span>Jogador: <strong id="nome-jogador"></strong></span>
+                <span>Pontos: <strong id="pontos">0</strong></span>
+            </div>
+
+            <p id="numero-pergunta"></p>
+
+            <h2 id="pergunta"></h2>
+
+            <div id="alternativas" class="alternativas"></div>
+
+            <div id="explicacao" class="oculto"></div>
+
+            <button id="botao-proxima" class="oculto">
+                Próxima pergunta
+            </button>
+        </section>
+
+        <!-- Tela de resultado -->
+        <section id="tela-resultado" class="tela oculto">
+            <h2>Resultado final</h2>
+
+            <p id="mensagem-resultado"></p>
+            <p id="pontuacao"></p>
+
+            <button onclick="voltarCadastro()">
+                Jogar novamente
+            </button>
+        </section>
+
+        <!-- Ranking -->
+        <section class="tela ranking">
+            <h2>Ranking</h2>
+
+            <ol id="lista-ranking"></ol>
+        </section>
+
+    </main>
+
+    <script>
+        const perguntas = [
+            {
+                pergunta: "Em que ano ocorreu a chegada dos portugueses ao Brasil?",
+                alternativas: [
+                    "1492",
+                    "1500",
+                    "1530",
+                    "1822"
+                ],
+                correta: 1,
+                explicacao:
+                    "A chegada dos portugueses ao Brasil ocorreu em 1500, durante a expedição comandada por Pedro Álvares Cabral."
+            },
+
+            {
+                pergunta: "Quem proclamou a Independência do Brasil?",
+                alternativas: [
+                    "Dom Pedro I",
+                    "Dom Pedro II",
+                    "Tiradentes",
+                    "Getúlio Vargas"
+                ],
+                correta: 0,
+                explicacao:
+                    "Dom Pedro I proclamou a Independência do Brasil em 7 de setembro de 1822."
+            },
+
+            {
+                pergunta: "Qual lei aboliu a escravidão no Brasil?",
+                alternativas: [
+                    "Lei de Terras",
+                    "Lei do Ventre Livre",
+                    "Lei Áurea",
+                    "Lei Eusébio de Queirós"
+                ],
+                correta: 2,
+                explicacao:
+                    "A Lei Áurea foi assinada pela princesa Isabel em 13 de maio de 1888 e aboliu oficialmente a escravidão no Brasil."
+            },
+
+            {
+                pergunta: "Em que ano foi proclamada a República no Brasil?",
+                alternativas: [
+                    "1822",
+                    "1888",
+                    "1889",
+                    "1930"
+                ],
+                correta: 2,
+                explicacao:
+                    "A República foi proclamada em 15 de novembro de 1889 pelo Marechal Deodoro da Fonseca."
+            },
+
+            {
+                pergunta: "Quem foi Tiradentes?",
+                alternativas: [
+                    "Um imperador",
+                    "Um líder da Inconfidência Mineira",
+                    "Um presidente",
+                    "Um navegador"
+                ],
+                correta: 1,
+                explicacao:
+                    "Tiradentes participou da Inconfidência Mineira, movimento que defendia a independência de Minas Gerais."
+            },
+
+            {
+                pergunta: "Qual civilização construiu as pirâmides de Gizé?",
+                alternativas: [
+                    "Romanos",
+                    "Gregos",
+                    "Egípcios",
+                    "Maias"
+                ],
+                correta: 2,
+                explicacao:
+                    "As pirâmides de Gizé foram construídas pelos antigos egípcios como monumentos funerários para os faraós."
+            },
+
+            {
+                pergunta: "Onde surgiu a democracia na Antiguidade?",
+                alternativas: [
+                    "Atenas",
+                    "Roma",
+                    "Esparta",
+                    "Alexandria"
+                ],
+                correta: 0,
+                explicacao:
+                    "A democracia surgiu em Atenas, uma cidade-Estado da Grécia Antiga."
+            },
+
+            {
+                pergunta: "Qual acontecimento iniciou a Revolução Francesa?",
+                alternativas: [
+                    "A Queda da Bastilha",
+                    "A Independência do Brasil",
+                    "A Guerra de Troia",
+                    "A queda do Império Romano"
+                ],
+                correta: 0,
+                explicacao:
+                    "A Queda da Bastilha, em 14 de julho de 1789, é considerada um dos principais acontecimentos do início da Revolução Francesa."
+            },
+
+            {
+                pergunta: "Quem foi o primeiro imperador do Brasil?",
+                alternativas: [
+                    "Dom João VI",
+                    "Dom Pedro I",
+                    "Dom Pedro II",
+                    "Marechal Deodoro"
+                ],
+                correta: 1,
+                explicacao:
+                    "Dom Pedro I foi o primeiro imperador do Brasil e governou durante o Primeiro Reinado."
+            },
+
+            {
+                pergunta: "Em que ano terminou a Segunda Guerra Mundial?",
+                alternativas: [
+                    "1939",
+                    "1942",
+                    "1945",
+                    "1950"
+                ],
+                correta: 2,
+                explicacao:
+                    "A Segunda Guerra Mundial terminou em 1945, após a derrota das potências do Eixo."
+            }
+        ];
+
+        let perguntaAtual = 0;
+        let pontuacaoAtual = 0;
+        let nomeJogador = "";
+
+        const telaCadastro = document.getElementById("tela-cadastro");
+        const telaQuiz = document.getElementById("tela-quiz");
+        const telaResultado = document.getElementById("tela-resultado");
+
+        const formulario =
+            document.getElementById("formulario-cadastro");
+
+        const nomeJogadorElemento =
+            document.getElementById("nome-jogador");
+
+        const pontosElemento =
+            document.getElementById("pontos");
+
+        const numeroPergunta =
+            document.getElementById("numero-pergunta");
+
+        const perguntaElemento =
+            document.getElementById("pergunta");
+
+        const alternativasElemento =
+            document.getElementById("alternativas");
+
+        const explicacaoElemento =
+            document.getElementById("explicacao");
+
+        const botaoProxima =
+            document.getElementById("botao-proxima");
+
+        formulario.addEventListener("submit", function(evento) {
+            evento.preventDefault();
+
+            nomeJogador =
+                document.getElementById("nome").value.trim();
+
+            if (nomeJogador === "") {
+                document.getElementById("mensagem-erro").textContent =
+                    "Digite seu nome para continuar.";
+                return;
+            }
+
+            nomeJogadorElemento.textContent = nomeJogador;
+
+            telaCadastro.classList.add("oculto");
+            telaQuiz.classList.remove("oculto");
+
+            iniciarQuiz();
+        });
+
+        function iniciarQuiz() {
+            perguntaAtual = 0;
+            pontuacaoAtual = 0;
+            pontosElemento.textContent = "0";
+
+            mostrarPergunta();
+        }
+
+        function mostrarPergunta() {
+            const perguntaSelecionada = perguntas[perguntaAtual];
+
+            numeroPergunta.textContent =
+                `Pergunta ${perguntaAtual + 1} de ${perguntas.length}`;
+
+            perguntaElemento.textContent =
+                perguntaSelecionada.pergunta;
+
+            alternativasElemento.innerHTML = "";
+
+            explicacaoElemento.classList.add("oculto");
+            botaoProxima.classList.add("oculto");
+
+            perguntaSelecionada.alternativas.forEach(
+                function(alternativa, indice) {
+                    const botao = document.createElement("button");
+
+                    botao.textContent = alternativa;
+                    botao.classList.add("alternativa");
+
+                    botao.addEventListener("click", function() {
+                        verificarResposta(indice, botao);
+                    });
+
+                    alternativasElemento.appendChild(botao);
+                }
+            );
+        }
+
+        function verificarResposta(indiceEscolhido, botaoEscolhido) {
+            const perguntaSelecionada = perguntas[perguntaAtual];
+            const botoes = document.querySelectorAll(".alternativa");
+
+            botoes.forEach(function(botao) {
+                botao.disabled = true;
+            });
+
+            if (indiceEscolhido === perguntaSelecionada.correta) {
+                botaoEscolhido.classList.add("correta");
+
+                pontuacaoAtual++;
+                pontosElemento.textContent = pontuacaoAtual;
+            } else {
+                botaoEscolhido.classList.add("errada");
+
+                botoes[perguntaSelecionada.correta]
+                    .classList.add("correta");
+            }
+
+            explicacaoElemento.textContent =
+                "Explicação: " + perguntaSelecionada.explicacao;
+
+            explicacaoElemento.classList.remove("oculto");
+            botaoProxima.classList.remove("oculto");
+        }
+
+        botaoProxima.addEventListener("click", function() {
+            perguntaAtual++;
+
+            if (perguntaAtual < perguntas.length) {
+                mostrarPergunta();
+            } else {
+                finalizarQuiz();
+            }
+        });
+
+        function finalizarQuiz() {
+            telaQuiz.classList.add("oculto");
+            telaResultado.classList.remove("oculto");
+
+            document.getElementById("mensagem-resultado").textContent =
+                `Parabéns, ${nomeJogador}!`;
+
+            document.getElementById("pontuacao").textContent =
+                `Você acertou ${pontuacaoAtual} de ${perguntas.length} perguntas.`;
+
+            salvarResultado();
+            mostrarRanking();
+        }
+
+        function salvarResultado() {
+            const ranking =
+                JSON.parse(localStorage.getItem("rankingHistoria")) || [];
+
+            ranking.push({
+                nome: nomeJogador,
+                pontos: pontuacaoAtual
+            });
+
+            ranking.sort(function(a, b) {
+                return b.pontos - a.pontos;
+            });
+
+            localStorage.setItem(
+                "rankingHistoria",
+                JSON.stringify(ranking.slice(0, 10))
+            );
+        }
+
+        function mostrarRanking() {
+            const listaRanking =
+                document.getElementById("lista-ranking");
+
+            const ranking =
+                JSON.parse(localStorage.getItem("rankingHistoria")) || [];
+
+            listaRanking.innerHTML = "";
+
+            if (ranking.length === 0) {
+                listaRanking.innerHTML =
+                    "<li>Nenhum jogador registrado.</li>";
+                return;
+            }
+
+            ranking.forEach(function(jogador) {
+                const item = document.createElement("li");
+
+                item.textContent =
+                    `${jogador.nome} — ${jogador.pontos} ponto(s)`;
+
+                listaRanking.appendChild(item);
+            });
+        }
+
+        function voltarCadastro() {
+            telaResultado.classList.add("oculto");
+            telaCadastro.classList.remove("oculto");
+
+            formulario.reset();
+        }
+
+        mostrarRanking();
+    </script>
+
+</body>
+</html>
